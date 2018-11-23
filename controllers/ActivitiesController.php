@@ -303,9 +303,11 @@ class ActivitiesController extends BaseController
 
     public function actionTt()
     {
-        spl_autoload_unregister(['YiiBase', 'autoload']);
-        include('../lib/Yu.php');
-        $yu=new \Yu();
-        $yu->ni();
+//        spl_autoload_unregister(['YiiBase', 'autoload']);
+//        include('../lib/Yu.php');
+//        $yu=new \Yu();
+//        $yu->ni();
+        $model=Users::find()->select(['username','id'])->column();
+        var_dump($model);
     }
 }
