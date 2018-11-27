@@ -14,6 +14,7 @@ use Yii;
  * @property string $card
  * @property string $password
  * @property string $head_url
+ * @property string $type
  * @property string $identification
  * @property string $create_at
  * @property string $update_at
@@ -53,6 +54,7 @@ class Users extends Base
             'card' => 'Card',
             'password' => 'Password',
             'head_url' => 'Head Url',
+            'type' => 'type',
             'identification' => 'identification',
             'create_at' => 'Create At',
             'update_at' => 'Update At',

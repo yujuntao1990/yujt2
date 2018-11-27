@@ -307,7 +307,7 @@ class ActivitiesController extends BaseController
 //        include('../lib/Yu.php');
 //        $yu=new \Yu();
 //        $yu->ni();
-        $model=Users::find()->select(['username','id'])->column();
+        $model=Users::className();
         var_dump($model);
     }
 }
