@@ -21,6 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property string $contact
  * @property integer $user_id
  * @property integer $photo_url
+ * @property integer $sum_up
  * @property string $created_at
  * @property string $updated_at
  */
@@ -43,7 +44,7 @@ class Activities extends Base
         return [
             [['title', 'content', 'cate_id','reg_time_start', 'reg_time_end', 'sports_id', 'contact', 'user_id','people_num','address','entry_fee'], 'required'],
             [['cate_id', 'sports_id', 'user_id'], 'integer'],
-            [['title', 'content', 'reg_time_start', 'reg_time_end', 'entry_fee', 'contact','people_num','address'], 'string', 'max' => 255],
+            [['title', 'content', 'reg_time_start', 'reg_time_end','contact','people_num','address'], 'string', 'max' => 255],
         ];
     }
 
@@ -68,6 +69,7 @@ class Activities extends Base
             'photo_url' => 'photo_url',
             'create_at' => 'Create At',
             'update_at' => 'Update At',
+            'sum_up' => 'sum_up'
         ];
     }
 

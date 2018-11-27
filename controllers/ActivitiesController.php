@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\ActivitiesPhotos;
 use app\models\ActivityCollect;
 use app\models\Applicants;
 use app\models\Comment;
@@ -72,6 +73,12 @@ class ActivitiesController extends BaseController
                 }
             }
             $data['applicants']=Applicants::find()->where(['activity_id'=>$id])->asArray()->all();
+            $activity_photos=ActivitiesPhotos::find()->where(['activity_id'=>$id])->asArray()->all();
+            if (!empty($activity_photos)){
+                foreach ($activity_photos as $key => $value){
+                    $data['activity_photos'][$key]=$value['activity_photo'];
+                }
+            }
 
             return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }
@@ -309,5 +316,38 @@ class ActivitiesController extends BaseController
 //        $yu->ni();
         $model=Users::className();
         var_dump($model);
+    }
+
+    public function actionSumup($id)
+    {
+        $post=Yii::$app->request->post();
+        $transaction = Yii::$app->db->beginTransaction();
+        try{
+            if (!empty($post)){
+                $activity=$this->findModel($id);
+                $activity->sum_up=$post['sum_up'];
+                if (!$activity->save()){
+                    throw new Exception($activity->getErrors());
+                }
+                if (isset($_FILES['activity_photo'])){
+                    foreach ($_FILES['activity_photo']['name'] as $key => $value){
+                        $activity_photo=new ActivitiesPhotos();
+                        move_uploaded_file($_FILES['activity_photo']["tmp_name"][$key], "activities/" . time() . $_FILES['activity_photo']["name"][$key]);
+                        $activity_photo->activity_photo=time().$_FILES['activity_photo']["name"][$key];
+                        $activity_photo->activity_id=$id;
+                        $activity_photo->user_id=$post['user_id'];
+                        if (!$activity_photo->save())
+                        {
+                            throw new Exception(current($activity->getErrors()));
+                        }
+                    }
+                }
+                $transaction->commit();
+                return json_encode(['code' => 200, 'message' => '添加成功']);
+            }
+        }catch (Exception $e){
+            $transaction->rollBack();
+            return json_encode(['code'=>500,'message'=>'添加失败','data'=>$e->getMessage()]);
+        }
     }
 }
