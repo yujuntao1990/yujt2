@@ -21,7 +21,7 @@ use yii\helpers\ArrayHelper;
  * @property string $contact
  * @property integer $user_id
  * @property integer $photo_url
- * @property integer $sum_up
+ * @property string $sum_up
  * @property string $created_at
  * @property string $updated_at
  */

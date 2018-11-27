@@ -7,6 +7,8 @@ use app\models\ActivityCollect;
 use app\models\Applicants;
 use app\models\Comment;
 use app\models\Groups;
+use app\models\OrderApplicant;
+use app\models\Orders;
 use app\models\Users;
 use Yii;
 use app\models\Activities;
@@ -349,5 +351,103 @@ class ActivitiesController extends BaseController
             $transaction->rollBack();
             return json_encode(['code'=>500,'message'=>'添加失败','data'=>$e->getMessage()]);
         }
+    }
+
+    public function actionOrder()
+    {
+        $post=Yii::$app->request->post();
+        $transaction=Yii::$app->db->beginTransaction();
+        try{
+            if (!empty($post)){
+                $orders=new Orders();
+                $orders->order_number=uniqid();
+                $orders->activity_id=$post['activity_id'];
+                $orders->no_status=$post['no_status'];
+                $orders->group_id=$post['group_id'];
+                $orders->already_arrived=$post['already_arrived'];
+                $orders->money=$post['money'];
+                $orders->user_id=$post['user_id'];
+                if (!$orders->save()){
+                    throw new Exception($orders->getErrors());
+                }
+                if (empty($post['applicant_id'])){
+                    throw new Exception("报名者不能为空");
+                }
+                foreach ($post['applicant_id'] as $key => $value){
+                    $orderapplicant=new OrderApplicant();
+                    $orderapplicant->order_id=$orders->id;
+                    $orderapplicant->applicant_id=$value;
+                    if (!$orderapplicant->save()){
+                        throw new Exception($orders->getErrors());
+                    }
+                }
+                $transaction->commit();
+                return json_encode(['code' => 200, 'message' => '添加成功']);
+            }
+        }catch (Exception $e){
+            $transaction->rollBack();
+            return json_encode(['code'=>500,'message'=>'添加失败','data'=>$e->getMessage()]);
+        }
+    }
+
+    public function actionOrders($user_id)
+    {
+        $orders=Orders::findAll(['user_id'=>$user_id]);
+        $orders=ArrayHelper::toArray($orders);
+        if (!empty($orders)){
+            foreach ($orders as $key => $value){
+                $activity=Activities::findOne($orders[$key]['activity_id']);
+                $orders[$key]['title']=$activity->title;
+                $orders[$key]['content']=$activity->content;
+                $orders[$key]['baomingtime']=$activity->reg_time_end;
+            }
+            return json_encode(['code'=>200,'message'=>"获取数据成功",'data'=>$orders]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+    }
+
+    public function actionDetail($order_id)
+    {
+        $order=Orders::findOne($order_id);
+        $order=ArrayHelper::toArray($order);
+        if (!empty($order)){
+            $activity=Activities::find()->where(['id'=>$order['activity_id']])->select(['title','reg_time_start','reg_time_end','people_num','address'])->asArray()->one();
+            $order['activity']=$activity;
+            return json_encode(['code'=>200,'message'=>"获取数据成功",'data'=>$order]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+    }
+
+    public function actionValidate($order_id)
+    {
+        $post=Yii::$app->request->post();
+        if (!empty($post)){
+            $order=Orders::findOne($order_id);
+            if ($order){
+                $order->already_arrived=$post['already_arrived'];
+                if ($order->save()){
+                    return json_encode(['code' => 200, 'message' => '已验证']);
+                }
+            }
+        }
+        return json_encode(['code'=>500,'message'=>'验证失败','data'=>$order->getErrors()]);
+    }
+
+    public function actionDele($order_id)
+    {
+        $model=Orders::findOne($order_id);
+        if ($model->delete()){
+            return json_encode(['code'=>200,'message'=>'删除成功']);
+        }
+        return json_encode(['code'=>500,'message'=>'删除失败']);
+    }
+
+    public function actionShousuo($cate_id)
+    {
+        $data=Activities::find()->where(['cate_id'=>$cate_id])->asArray()->all();
+        if (!empty($data)) {
+            return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
     }
 }
