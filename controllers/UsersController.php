@@ -52,9 +52,14 @@ class UsersController extends BaseController
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $data=Users::find()->where(['id'=>$id])->asArray()->one();
+        if ($data){
+            return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+//        return $this->render('view', [
+//            'model' => $this->findModel($id),
+//        ]);
     }
 
     /**

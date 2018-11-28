@@ -7,9 +7,12 @@ use app\models\ActivityCollect;
 use app\models\Applicants;
 use app\models\Comment;
 use app\models\Groups;
+use app\models\Lifes;
 use app\models\OrderApplicant;
 use app\models\Orders;
+use app\models\Qinzis;
 use app\models\Users;
+use app\models\Weekends;
 use Yii;
 use app\models\Activities;
 use app\models\ActivitiesSearch;
@@ -447,6 +450,163 @@ class ActivitiesController extends BaseController
         $data=Activities::find()->where(['cate_id'=>$cate_id])->asArray()->all();
         if (!empty($data)) {
             return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+    }
+
+    public function actionListSearch()
+    {
+        $post=Yii::$app->request->post();
+        if (!empty($post)){
+            $query=Activities::find();
+            //var_dump($query);exit();
+            if (!empty($post['cate_id'])){
+                $query=$query->andWhere(['cate_id'=>$post['cate_id']]);
+            }
+            if (!empty($post['entry_fee'])){
+                //var_dump($post['entry_fee']);exit();
+                switch ($post['entry_fee']){
+                    case 1:
+                        $query=$query->andWhere(['entry_fee'=>0])->andWhere(['entry_fee'=>0]);
+                        break;
+                    case 2:
+                        $query=$query->andWhere(['<','entry_fee',100])->andWhere(['>=','entry_fee',1]);
+                        break;
+                    case 3:
+                        $query=$query->andWhere(['>=','entry_fee',100])->andWhere(['<','entry_fee',300]);
+                        break;
+                    case 4:
+                        $query=$query->andWhere(['>=','entry_fee',300])->andWhere(['<','entry_fee',500]);
+                        break;
+                    default:
+                        $query=$query->andWhere(['>=','entry_fee',500])->andWhere(['>=','entry_fee',500]);
+                }
+            }
+            //var_dump($query->createCommand()->getRawSql());
+            //var_dump($query->where);exit();
+            if (!empty($post['datetime'])){
+                //var_dump($post['datetime']);exit();
+                $num=count($query->where);
+                if ($num==1){
+                    foreach ($post['datetime'] as $key => $value){
+                        $s=strtotime($value);
+                        $da=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
+                        if ($da){
+                            $data[]=$da;
+                        }
+                        //var_dump($query->where);exit();
+                        unset($query->where[2]);
+                        unset($query->where[3]);
+
+                        //var_dump($query);
+                    }
+                    if (!empty($data)){
+                        return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+                    }
+                    return json_encode(['code'=>500,'message'=>'空数据']);
+                }
+                if ($num==3){
+                    foreach ($post['datetime'] as $key => $value){
+                        $s=strtotime($value);
+                        $da=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
+                        if ($da){
+                            $data[]=$da;
+                        }
+                        unset($query->where[3]);
+                        unset($query->where[4]);
+                        //var_dump($query->where);exit();
+                        //var_dump($query);
+                    }
+                    if (!empty($data)){
+                        return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+                    }
+                    return json_encode(['code'=>500,'message'=>'空数据']);
+                }
+                if ($num==4){
+                    foreach ($post['datetime'] as $key => $value){
+                        $s=strtotime($value);
+                        $da=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
+                        if ($da){
+                            $data[]=$da;
+                        }
+                        unset($query->where[4]);
+                        unset($query->where[5]);
+                        //var_dump($query);
+                    }
+                    if (!empty($data)){
+                        return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+                    }
+                    return json_encode(['code'=>500,'message'=>'空数据']);
+                }
+                foreach ($post['datetime'] as $key => $value){
+                    $s=strtotime($value);
+                    $data[]=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
+                    $query->where=null;
+                    //var_dump($query);
+                }
+                return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+            }
+            //var_dump($query->createCommand()->getRawSql());exit();
+            $data=$query->asArray()->all();
+            if ($data){
+                return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+            }
+            return json_encode(['code'=>500,'message'=>'空数据']);
+        }
+        return json_encode(['code'=>500,'message'=>'请求参数为空']);
+    }
+
+    public function actionIndexSearch()
+    {
+        $post=Yii::$app->request->post();
+        if (!empty($post)){
+            $query=Activities::find();
+            //var_dump($query);exit();
+            if (!empty($post['cate_id'])){
+                $query=$query->andWhere(['cate_id'=>$post['cate_id']]);
+            }
+            if (!empty($post['life_id'])){
+                $query=$query->andWhere(['life_id'=>$post['life_id']]);
+            }
+            if (!empty($post['qinzi_id'])){
+                $query=$query->andWhere(['qinzi_id'=>$post['qinzi_id']]);
+            }
+            if (!empty($post['weekend'])){
+                $week=strtotime("this ".$post['weekend']);
+                $query=$query->andFilterWhere(['>=','reg_time_end',$week])->andFilterWhere(['<','reg_time_end',$week+24*3600]);
+            }
+            $data=$query->asArray()->all();
+            if ($data){
+                return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+            }
+            return json_encode(['code'=>500,'message'=>'空数据']);
+        }
+        return json_encode(['code'=>500,'message'=>'请求参数为空']);
+    }
+
+    public function actionLifes()
+    {
+        $data = Lifes::find()->asArray()->all();
+        if (!empty($data)){
+            return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+    }
+
+    public function actionQinzis()
+    {
+        $data = Qinzis::find()->asArray()->all();
+        if (!empty($data)){
+            return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+    }
+
+    public function actionWeekends()
+    {
+        $data = Weekends::find()->asArray()->all();
+        if (!empty($data)){
+            return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }
         return json_encode(['code'=>500,'message'=>'空数据']);
     }
