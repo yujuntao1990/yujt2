@@ -12,9 +12,9 @@ use yii\web\Controller;
 class BaseController extends Controller
 {
     public function init(){
-//        $response = \Yii::$app->response;
-//        $response->format = \Yii\web\Response::FORMAT_RAW;
-//        $response->headers->add('Content-Type', 'application/json');
+        $response = \Yii::$app->response;
+        $response->format = \Yii\web\Response::FORMAT_RAW;
+        $response->headers->add('Content-Type', 'application/json');
         $this->enableCsrfValidation = false;
     }
 }
