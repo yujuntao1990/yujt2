@@ -484,8 +484,10 @@ class ActivitiesController extends BaseController
             }
             //var_dump($query->createCommand()->getRawSql());
             //var_dump($query->where);exit();
-            if (!empty($post['datetime'])){
-                //var_dump($post['datetime']);exit();
+            $d=$post['datetime'][0];
+            //var_dump(empty($d));exit();
+            if (!empty($d)){
+                //var_dump(empty($post['datetime']));exit();
                 $num=count($query->where);
                 if ($num==1){
                     foreach ($post['datetime'] as $key => $value){
