@@ -304,7 +304,7 @@ class ActivitiesController extends BaseController
             if ($groups){
                 $model['groups']=$groups;
             }
-            $applicants=Applicants::find()->where(['activity_id'=>$id])->select('username,tel,card')->asArray()->all();
+            $applicants=Applicants::find()->where(['activity_id'=>$id])->select('id,username,tel,card')->asArray()->all();
             if ($applicants){
                 $model['applicants']=$applicants;
             }
