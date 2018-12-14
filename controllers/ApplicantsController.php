@@ -9,6 +9,7 @@ use app\models\ApplicantsSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
 
 /**
  * ApplicantsController implements the CRUD actions for Applicants model.
@@ -52,9 +53,15 @@ class ApplicantsController extends BaseController
      */
     public function actionView($id)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
+        $data=$this->findModel($id);
+        $data=ArrayHelper::toArray($data);
+        if (!empty($data)){
+            return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
+        };
+        return json_encode(['code'=>500,'message'=>'空数据']);
+//        return $this->render('view', [
+//            'model' => $this->findModel($id),
+//        ]);
     }
 
     /**
@@ -71,7 +78,6 @@ class ApplicantsController extends BaseController
             $model->username=$post['username'];
             $model->tel=$post['tel'];
             $model->card=$post['card'];
-            $model->activity_id=$post['activity_id'];
             $model->user_id=$post['user_id'];
             if ($model->save()){
                 return json_encode(['code'=>200,'message'=>'添加成功']);
@@ -113,11 +119,18 @@ class ApplicantsController extends BaseController
      * @param integer $id
      * @return mixed
      */
-    public function actionDelete($id)
+    public function actionDelete()
     {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
+        $post = Yii::$app->request->post();
+        if (!empty($post)) {
+            $model=Applicants::findOne($post['id']);
+            if ($model) {
+                if ($model->delete()) {
+                    return json_encode(['code' => 200, 'message' => '删除成功']);
+                }
+            }
+        }
+        return json_encode(['code'=>500,'message'=>'删除失败']);
     }
 
     /**
@@ -136,16 +149,11 @@ class ApplicantsController extends BaseController
         }
     }
 
-    public function actionList($activity_id)
+    public function actionList($user_id)
     {
-        $data=Applicants::find()->where(['activity_id'=>$activity_id])->asArray()->all();
+        $data=Applicants::find()->where(['user_id'=>$user_id])->asArray()->all();
         if (!empty($data)){
-            $activity=Activities::find()->where(['id'=>$activity_id])->asArray()->one();
-            if (!empty($activity)){
-                $data['activity']=$activity;
                 return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
-            }
-            return json_encode(['code'=>500,'message'=>'这活动空数据']);
         };
         return json_encode(['code'=>500,'message'=>'空数据']);
     }

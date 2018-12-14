@@ -77,7 +77,13 @@ class ActivitiesController extends BaseController
                     $data['comments'][$key]['username']=Users::findOne($data['comments'][$key]['user_id'])->username;
                 }
             }
-            $data['applicants']=Applicants::find()->where(['activity_id'=>$id])->asArray()->all();
+            $orderApplicant=OrderApplicant::find()->where(['activity_id'=>$id])->select('applicant_id')->asArray()->all();
+            if ($orderApplicant){
+                foreach ($orderApplicant as $key => $value){
+                    $data['applicants'][]=Applicants::find()->where(['id'=>$value])->asArray()->one();
+                }
+            }
+
             $activity_photos=ActivitiesPhotos::find()->where(['activity_id'=>$id])->asArray()->all();
             if (!empty($activity_photos)){
                 foreach ($activity_photos as $key => $value){
@@ -304,10 +310,10 @@ class ActivitiesController extends BaseController
             if ($groups){
                 $model['groups']=$groups;
             }
-            $applicants=Applicants::find()->where(['activity_id'=>$id])->select('id,username,tel,card')->asArray()->all();
-            if ($applicants){
-                $model['applicants']=$applicants;
-            }
+//            $applicants=Applicants::find()->where(['activity_id'=>$id])->select('id,username,tel,card')->asArray()->all();
+//            if ($applicants){
+//                $model['applicants']=$applicants;
+//            }
             return json_encode(['code'=>200,'message'=>"获取数据成功",'data'=>$model]);
         }
         return json_encode(['code'=>500,'message'=>'空数据']);
@@ -380,6 +386,7 @@ class ActivitiesController extends BaseController
                     $orderapplicant=new OrderApplicant();
                     $orderapplicant->order_id=$orders->id;
                     $orderapplicant->applicant_id=$value;
+                    $orderapplicant->activity_id=$post['activity_id'];
                     if (!$orderapplicant->save()){
                         throw new Exception($orders->getErrors());
                     }

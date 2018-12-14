@@ -11,7 +11,6 @@ use Yii;
  * @property string $username
  * @property string $tel
  * @property string $card
- * @property integer $activity_id
  * @property integer $user_id
  */
 class Applicants extends Base
@@ -30,8 +29,7 @@ class Applicants extends Base
     public function rules()
     {
         return [
-            [['username', 'tel', 'card', 'activity_id','user_id'], 'required'],
-            [['activity_id'], 'integer'],
+            [['username', 'tel', 'card','user_id'], 'required'],
             [['username', 'tel', 'card'], 'string', 'max' => 255],
         ];
     }
@@ -46,13 +44,7 @@ class Applicants extends Base
             'username' => 'Username',
             'tel' => 'Tel',
             'card' => 'Card',
-            'activity_id' => 'Activity ID',
             'user_id' => 'user_id'
         ];
-    }
-
-    public function getActivity()
-    {
-        return $this->hasMany(Activities::className(),['id'=>'activity_id']);
     }
 }

@@ -10,6 +10,7 @@ use Yii;
  * @property integer $id
  * @property integer $order_id
  * @property integer $applicant_id
+ * @property integer $activity_id
  */
 class OrderApplicant extends \yii\db\ActiveRecord
 {
@@ -27,8 +28,8 @@ class OrderApplicant extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['order_id', 'applicant_id'], 'required'],
-            [['order_id', 'applicant_id'], 'integer'],
+            [['order_id', 'applicant_id','activity_id'], 'required'],
+            [['order_id', 'applicant_id','activity_id'], 'integer'],
         ];
     }
 
@@ -41,6 +42,7 @@ class OrderApplicant extends \yii\db\ActiveRecord
             'id' => 'ID',
             'order_id' => 'Order ID',
             'applicant_id' => 'Applicant ID',
+            'activity_id' => 'activity_id'
         ];
     }
 }
