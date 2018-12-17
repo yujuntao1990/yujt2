@@ -3,6 +3,9 @@
 namespace app\controllers;
 
 use app\models\Activities;
+use app\models\ClubsApplicants;
+use app\models\User;
+use app\models\Users;
 use Yii;
 use app\models\Applicants;
 use app\models\ApplicantsSearch;
@@ -53,12 +56,12 @@ class ApplicantsController extends BaseController
      */
     public function actionView($id)
     {
-        $data=$this->findModel($id);
-        $data=ArrayHelper::toArray($data);
-        if (!empty($data)){
-            return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
+        $data = $this->findModel($id);
+        $data = ArrayHelper::toArray($data);
+        if (!empty($data)) {
+            return json_encode(['code' => 200, 'message' => '获取数据成功', 'data' => $data]);
         };
-        return json_encode(['code'=>500,'message'=>'空数据']);
+        return json_encode(['code' => 500, 'message' => '空数据']);
 //        return $this->render('view', [
 //            'model' => $this->findModel($id),
 //        ]);
@@ -75,16 +78,16 @@ class ApplicantsController extends BaseController
 
         $post = Yii::$app->request->post();
         if (!empty($post)) {
-            $model->username=$post['username'];
-            $model->tel=$post['tel'];
-            $model->card=$post['card'];
-            $model->user_id=$post['user_id'];
-            if ($model->save()){
-                return json_encode(['code'=>200,'message'=>'添加成功']);
+            $model->username = $post['username'];
+            $model->tel = $post['tel'];
+            $model->card = $post['card'];
+            $model->user_id = $post['user_id'];
+            if ($model->save()) {
+                return json_encode(['code' => 200, 'message' => '添加成功']);
             }
 //            return $this->redirect(['view', 'id' => $model->id]);
         }
-        return json_encode(['code'=>500,'message'=>'添加失败','data'=>$model->getErrors()]);
+        return json_encode(['code' => 500, 'message' => '添加失败', 'data' => $model->getErrors()]);
 //        if ($model->load(Yii::$app->request->post()) && $model->save()) {
 //            return $this->redirect(['view', 'id' => $model->id]);
 //        } else {
@@ -123,14 +126,14 @@ class ApplicantsController extends BaseController
     {
         $post = Yii::$app->request->post();
         if (!empty($post)) {
-            $model=Applicants::findOne($post['id']);
+            $model = Applicants::findOne($post['id']);
             if ($model) {
                 if ($model->delete()) {
                     return json_encode(['code' => 200, 'message' => '删除成功']);
                 }
             }
         }
-        return json_encode(['code'=>500,'message'=>'删除失败']);
+        return json_encode(['code' => 500, 'message' => '删除失败']);
     }
 
     /**
@@ -151,11 +154,10 @@ class ApplicantsController extends BaseController
 
     public function actionList($user_id)
     {
-        $data=Applicants::find()->where(['user_id'=>$user_id])->asArray()->all();
-        if (!empty($data)){
-                return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
+        $data = Applicants::find()->where(['user_id' => $user_id])->asArray()->all();
+        if (!empty($data)) {
+            return json_encode(['code' => 200, 'message' => '获取数据成功', 'data' => $data]);
         };
-        return json_encode(['code'=>500,'message'=>'空数据']);
+        return json_encode(['code' => 500, 'message' => '空数据']);
     }
-
 }

@@ -258,4 +258,75 @@ class ClubsController extends BaseController
         }
         return json_encode(['code'=>500,'message'=>'空数据']);
     }
+
+    public function actionClubPeople($id)
+    {
+        $user_ids=ClubsApplicants::find()->where(['club_id'=>$id])->asArray()->all();
+        if ($user_ids){
+            //var_dump($applicant_ids);exit();
+            foreach ($user_ids as $e => $o){
+                $users[]=Users::find()->where(['id'=>$o['user_id']])->select('id,username,head_url')->asArray()->one();
+            }
+            $last_names = array_column($users,'username');
+            array_multisort($last_names);
+            //sort($last_names);
+            //var_dump($last_names);exit();
+            //$data=Users::find()->select('username')->orderBy('username')->asArray()->all();
+            foreach ($last_names as $key => $value)
+            {
+                $first[]=substr($value,0,1);
+            }
+            //var_dump($first);exit();
+            $first=array_unique($first);
+            //var_dump($first);exit();
+            $connection = Yii::$app->db;
+
+            foreach ($first as $val){
+                $sql='SELECT users.id,users.username,users.head_url FROM users JOIN clubs_applicants on users.id=clubs_applicants.user_id WHERE clubs_applicants.club_id='.$id.' and users.username LIKE "'.$val.'%"';
+                $command=$connection->createCommand($sql);
+                $s=$command->queryAll();
+                foreach ($s as $k => $m){
+                    $model[$val][$k]['id']=$m['id'];
+                    $model[$val][$k]['username']=$m['username'];
+                    $model[$val][$k]['head_url']=$m['head_url'];
+                }
+            }
+            //var_dump($model);exit();
+            return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$model]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+    }
+
+    public function actionSearch($id)
+    {
+        $post=Yii::$app->request->post();
+        if (!empty($post['username']))
+        {
+            $connection = Yii::$app->db;
+            $sql='SELECT users.id,users.username,users.head_url FROM users JOIN clubs_applicants on users.id=clubs_applicants.user_id WHERE clubs_applicants.club_id='.$id.' and users.username = "'.$post['username'].'"';
+            $command=$connection->createCommand($sql);
+            $s=$command->queryOne();
+            if ($s){
+                return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$s]);
+            }
+            return json_encode(['code'=>500,'message'=>'空数据']);
+        }
+        return json_encode(['code'=>500,'message'=>'请求不能为空']);
+    }
+
+    public function actionDele()
+    {
+        $post=Yii::$app->request->post();
+        if (!empty($post))
+        {
+            $model=ClubsApplicants::find()->where(['user_id'=>$post['user_id'],'club_id'=>$post['club_id']])->one();
+            if ($model){
+                if ($model->delete())
+                {
+                    return json_encode(['code' => 200, 'message' => '删除成功']);
+                }
+            }
+        }
+        return json_encode(['code'=>500,'message'=>'删除失败']);
+    }
 }

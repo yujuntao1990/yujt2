@@ -16,6 +16,9 @@ use Yii;
  * @property string $head_url
  * @property string $type
  * @property string $identification
+ * @property string $bank_card
+ * @property string $truename
+ * @property string $bank_deposit
  * @property string $create_at
  * @property string $update_at
  */
@@ -58,6 +61,14 @@ class Users extends Base
             'identification' => 'identification',
             'create_at' => 'Create At',
             'update_at' => 'Update At',
+            'bank_deposit' => 'bank_deposit',
+            'truename' => 'truename',
+            'bank_card' => 'bank_card',
         ];
+    }
+
+    public function getClub()
+    {
+        return $this->hasMany(ClubsApplicants::className(),['user_id'=>$this->id]);
     }
 }

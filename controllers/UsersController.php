@@ -54,6 +54,7 @@ class UsersController extends BaseController
     {
         $data=Users::find()->where(['id'=>$id])->asArray()->one();
         if ($data){
+            unset($data['password']);
             return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
         }
         return json_encode(['code'=>500,'message'=>'空数据']);
@@ -229,4 +230,31 @@ class UsersController extends BaseController
         }
         return json_encode(['code'=>500,'message'=>'修改失败','data'=>$model->getErrors()]);
     }
+
+    public function actionGettel($id)
+    {
+        $model=$this->findModel($id);
+        if ($model){
+            return json_encode(['code'=>200,'message'=>'获取成功','data'=>['tel'=>$model->telephone]]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+    }
+
+    public function actionBrank($id)
+    {
+        $model=$this->findModel($id);
+        if ($model){
+            $post=Yii::$app->request->post();
+            if (!empty($post)){
+                $model->bank_card=$post['bank_card'];
+                $model->truename=$post['truename'];
+                $model->bank_deposit=$post['bank_deposit'];
+                if ($model->save()){
+                    return json_encode(['code'=>200,'message'=>'添加成功']);
+                }
+            }
+        }
+        return json_encode(['code'=>500,'message'=>'添加失败','data'=>$model->getErrors()]);
+    }
+
 }
