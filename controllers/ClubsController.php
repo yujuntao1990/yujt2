@@ -105,7 +105,8 @@ class ClubsController extends BaseController
                 $model->club_about = $post['club_about'];
                 $model->contact = $post['contact'];
 //            $model->club_activity = $post['club_activity'];
-//            $model->sports_id = $post['sports_id'];
+                $model->sports_id = $post['sports_id'];
+                $model->life_id = $post['life_id'];
 //            $model->money = $post['money'];
 //            $model->begin_time = $post['begin_time'];
 //            $model->end_time = $post['end_time'];

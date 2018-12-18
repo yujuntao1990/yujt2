@@ -11,6 +11,7 @@ use app\models\Lifes;
 use app\models\OrderApplicant;
 use app\models\Orders;
 use app\models\Qinzis;
+use app\models\Sports;
 use app\models\Users;
 use app\models\Weekends;
 use Yii;
@@ -65,7 +66,8 @@ class ActivitiesController extends BaseController
     public function actionView($id)
     {
         $data=$this->findModel($id);
-        $data=ArrayHelper::toArray($data);
+        //var_dump($data);exit();
+        //$data=ArrayHelper::toArray($data);
         //var_dump($data);exit();
         if (!empty($data)){
             $data['username']=Users::findOne($data['user_id'])->username;
@@ -120,6 +122,7 @@ class ActivitiesController extends BaseController
                 $model->people_num=$post['people_num'];
                 $model->address=$post['address'];
                 $model->entry_fee=$post['entry_fee'];
+                $model->life_id=$post['life_id'];
                 $model->sports_id=$post['sports_id'];
                 $model->contact=$post['contact'];
                 $model->user_id=$post['user_id'];
@@ -204,7 +207,7 @@ class ActivitiesController extends BaseController
      */
     protected function findModel($id)
     {
-        if (($model = Activities::findOne($id)) !== null) {
+        if (($model = Activities::find()->where(['id'=>$id])->with('sports')->with('cates')->with('lifes')->asArray()->one()) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
@@ -213,7 +216,7 @@ class ActivitiesController extends BaseController
 
     public function actionList()
     {
-        $data = Activities::find()->asArray()->all();
+        $data = Activities::find()->with('sports')->with('cates')->with('lifes')->asArray()->all();
         if (!empty($data)){
             return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }
@@ -304,7 +307,7 @@ class ActivitiesController extends BaseController
     public function actionBaoming($id)
     {
         $model=$this->findModel($id);
-        $model=ArrayHelper::toArray($model);
+        //$model=ArrayHelper::toArray($model);
         if ($model){
             $groups=Groups::find()->where(['activity_id'=>$id])->asArray()->all();
             if ($groups){
@@ -335,26 +338,28 @@ class ActivitiesController extends BaseController
         $transaction = Yii::$app->db->beginTransaction();
         try{
             if (!empty($post)){
-                $activity=$this->findModel($id);
-                $activity->sum_up=$post['sum_up'];
-                if (!$activity->save()){
-                    throw new Exception($activity->getErrors());
-                }
-                if (isset($_FILES['activity_photo'])){
-                    foreach ($_FILES['activity_photo']['name'] as $key => $value){
-                        $activity_photo=new ActivitiesPhotos();
-                        move_uploaded_file($_FILES['activity_photo']["tmp_name"][$key], "activities/" . time() . $_FILES['activity_photo']["name"][$key]);
-                        $activity_photo->activity_photo=time().$_FILES['activity_photo']["name"][$key];
-                        $activity_photo->activity_id=$id;
-                        $activity_photo->user_id=$post['user_id'];
-                        if (!$activity_photo->save())
-                        {
-                            throw new Exception(current($activity->getErrors()));
+                $activity=Activities::findOne($id);
+                if ($activity){
+                    $activity->sum_up=$post['sum_up'];
+                    if (!$activity->save()){
+                        throw new Exception($activity->getErrors());
+                    }
+                    if (isset($_FILES['activity_photo'])){
+                        foreach ($_FILES['activity_photo']['name'] as $key => $value){
+                            $activity_photo=new ActivitiesPhotos();
+                            move_uploaded_file($_FILES['activity_photo']["tmp_name"][$key], "activities/" . time() . $_FILES['activity_photo']["name"][$key]);
+                            $activity_photo->activity_photo=time().$_FILES['activity_photo']["name"][$key];
+                            $activity_photo->activity_id=$id;
+                            $activity_photo->user_id=$post['user_id'];
+                            if (!$activity_photo->save())
+                            {
+                                throw new Exception(current($activity->getErrors()));
+                            }
                         }
                     }
+                    $transaction->commit();
+                    return json_encode(['code' => 200, 'message' => '添加成功']);
                 }
-                $transaction->commit();
-                return json_encode(['code' => 200, 'message' => '添加成功']);
             }
         }catch (Exception $e){
             $transaction->rollBack();
@@ -614,6 +619,15 @@ class ActivitiesController extends BaseController
     public function actionWeekends()
     {
         $data = Weekends::find()->asArray()->all();
+        if (!empty($data)){
+            return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+    }
+
+    public function actionSports()
+    {
+        $data = Sports::find()->asArray()->all();
         if (!empty($data)){
             return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }

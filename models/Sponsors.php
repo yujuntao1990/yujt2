@@ -14,6 +14,7 @@ use Yii;
  * @property string $photo
  * @property string $sponsors_activity
  * @property integer $sports_id
+ * @property integer $life_id
  * @property integer $money
  * @property string $begin_time
  * @property string $end_time
@@ -39,8 +40,8 @@ class Sponsors extends Base
     public function rules()
     {
         return [
-            [['sponsors_name', 'sponsors_about', 'contact', 'sponsors_activity', 'sports_id', 'money', 'begin_time', 'end_time', 'people_num', 'address', 'user_id'], 'required'],
-            [['sports_id', 'money', 'people_num', 'user_id'], 'integer'],
+            [['sponsors_name', 'sponsors_about', 'contact', 'sponsors_activity','life_id', 'sports_id', 'money', 'begin_time', 'end_time', 'people_num', 'address', 'user_id'], 'required'],
+            [['sports_id', 'life_id','money', 'people_num', 'user_id'], 'integer'],
             [['sponsors_name', 'sponsors_about', 'contact', 'photo', 'sponsors_activity', 'begin_time', 'end_time', 'address'], 'string', 'max' => 255],
         ];
     }
@@ -57,6 +58,7 @@ class Sponsors extends Base
             'contact' => 'Contact',
             'photo' => 'Photo',
             'sponsors_activity' => 'Sponsors Activity',
+            'life_id' => 'life_id',
             'sports_id' => 'Sports ID',
             'money' => 'Money',
             'begin_time' => 'Begin Time',

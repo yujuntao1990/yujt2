@@ -17,6 +17,7 @@ use yii\helpers\ArrayHelper;
  * @property string $people_num
  * @property string $address
  * @property string $entry_fee
+ * @property string $life_id
  * @property integer $sports_id
  * @property string $contact
  * @property integer $user_id
@@ -42,8 +43,8 @@ class Activities extends Base
     public function rules()
     {
         return [
-            [['title', 'content', 'cate_id','reg_time_start', 'reg_time_end', 'sports_id', 'contact', 'user_id','people_num','address','entry_fee'], 'required'],
-            [['cate_id', 'sports_id', 'user_id'], 'integer'],
+            [['title', 'content', 'cate_id','reg_time_start', 'reg_time_end', 'sports_id', 'life_id','contact', 'user_id','people_num','address','entry_fee'], 'required'],
+            [['cate_id', 'sports_id', 'user_id','life_id'], 'integer'],
             [['title', 'content', 'reg_time_start', 'reg_time_end','contact','people_num','address'], 'string', 'max' => 255],
         ];
     }
@@ -63,6 +64,7 @@ class Activities extends Base
             'people_num' => 'people_num',
             'address' => 'address',
             'entry_fee' => 'Entry Fee',
+            'life_id' => 'life_id',
             'sports_id' => 'Sports ID',
             'contact' => 'Contact',
             'user_id' => 'User ID',
@@ -96,5 +98,10 @@ class Activities extends Base
     public function getUsers()
     {
         return $this->hasOne(Users::className(),['id'=>'user_id']);
+    }
+
+    public function getLifes()
+    {
+        return $this->hasOne(Lifes::className(),['id'=>'life_id']);
     }
 }

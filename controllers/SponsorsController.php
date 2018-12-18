@@ -100,6 +100,7 @@ class SponsorsController extends BaseController
                 $model->sponsors_about = $post['sponsors_about'];
                 $model->contact = $post['contact'];
                 $model->sponsors_activity = $post['sponsors_activity'];
+                $model->life_id = $post['life_id'];
                 $model->sports_id = $post['sports_id'];
                 $model->money = $post['money'];
                 $model->begin_time = $post['begin_time'];

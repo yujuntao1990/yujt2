@@ -13,6 +13,7 @@ use Yii;
  * @property string $contact
  * @property string $photo
  * @property string $club_activity
+ * @property string $life_id
  * @property integer $sports_id
  * @property integer $money
  * @property string $begin_time
@@ -39,8 +40,8 @@ class Clubs extends Base
     public function rules()
     {
         return [
-            [['club_name', 'club_about', 'contact','user_id'], 'required'],
-            [['user_id'], 'integer'],
+            [['club_name', 'club_about', 'contact','user_id','life_id'], 'required'],
+            [['user_id','life_id'], 'integer'],
             [['club_name', 'club_about', 'contact','photo'], 'string', 'max' => 255],
         ];
     }
@@ -57,6 +58,7 @@ class Clubs extends Base
             'contact' => 'contact',
             'photo' => 'Photo',
             'club_activity' => 'Club Activity',
+            'life_id' => 'life_id',
             'sports_id' => 'Sports ID',
             'money' => 'Money',
             'begin_time' => 'Begin Time',
