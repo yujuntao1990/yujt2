@@ -71,4 +71,19 @@ class Users extends Base
     {
         return $this->hasMany(ClubsApplicants::className(),['user_id'=>$this->id]);
     }
+
+    public function getActivities()
+    {
+        return $this->hasMany(Activities::className(),['user_id'=>$this->id]);
+    }
+
+    public function getClubs()
+    {
+        return $this->hasMany(Clubs::className(),['user_id'=>$this->id]);
+    }
+
+    public function getSponsors()
+    {
+        return $this->hasMany(Sponsors::className(),['user_id'=>$this->id]);
+    }
 }

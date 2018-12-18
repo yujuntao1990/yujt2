@@ -75,4 +75,14 @@ class Clubs extends Base
     {
         return $this->hasOne(Users::className(),['id'=>'user_id']);
     }
+
+    public function getSports()
+    {
+        return $this->hasOne(Sports::className(),['id'=>'sports_id']);
+    }
+
+    public function getLifes()
+    {
+        return $this->hasOne(Lifes::className(),['id'=>'life_id']);
+    }
 }

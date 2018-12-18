@@ -207,7 +207,7 @@ class ClubsController extends BaseController
 
     public function actionList()
     {
-        $data=Clubs::find()->asArray()->all();
+        $data=Clubs::find()->asArray()->with('sports')->all();
         //var_dump($data->createCommand()->getRawSql());exit();
 
         if (!empty($data)){

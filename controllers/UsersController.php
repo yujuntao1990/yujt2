@@ -2,6 +2,9 @@
 
 namespace app\controllers;
 
+use app\models\Activities;
+use app\models\Clubs;
+use app\models\Sponsors;
 use Yii;
 use app\models\Users;
 use app\models\UsersSearch;
@@ -257,4 +260,12 @@ class UsersController extends BaseController
         return json_encode(['code'=>500,'message'=>'添加失败','data'=>$model->getErrors()]);
     }
 
+    public function actionCreated($id)
+    {
+        $data=[];
+        $data['Activities']=Activities::find()->where(['user_id'=>$id])->with('sports')->asArray()->all();
+        $data['Clubs']=Clubs::find()->where(['user_id'=>$id])->with('sports')->asArray()->all();
+        $data['Sponsors']=Sponsors::find()->where(['user_id'=>$id])->with('sports')->asArray()->all();
+        return json_encode(['code'=>200,'message'=>'获取成功','data'=>$data]);
+    }
 }

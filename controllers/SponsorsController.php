@@ -208,7 +208,7 @@ class SponsorsController extends BaseController
 
     public function actionList()
     {
-        $data=Sponsors::find()->asArray()->all();
+        $data=Sponsors::find()->with('sports')->asArray()->all();
         //var_dump($data->createCommand()->getRawSql());exit();
 
         if (!empty($data)){
