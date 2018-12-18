@@ -251,9 +251,10 @@ class ClubsController extends BaseController
         $data=ClubsApplicants::find()->where(['user_id'=>$user_id])->select("user_id,club_id")->asArray()->all();
         if ($data){
             foreach ($data as $key => $value){
-                $clubs=Clubs::find()->where(['id'=>$data[$key]['club_id']])->asArray()->one();
+                $clubs=Clubs::find()->where(['id'=>$data[$key]['club_id']])->with('sports')->asArray()->one();
                 $data[$key]['club_name']=$clubs['club_name'];
                 $data[$key]['club_activity']=$clubs['club_activity'];
+                $data[$key]['sports']=$clubs['sports'];
             }
             return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }

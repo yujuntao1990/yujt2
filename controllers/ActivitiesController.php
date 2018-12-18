@@ -295,9 +295,10 @@ class ActivitiesController extends BaseController
         $data=ActivityCollect::find()->where(['user_id'=>$user_id])->select("user_id,activity_id")->asArray()->all();
         if ($data){
             foreach ($data as $key => $value){
-                $Activities=Activities::find()->where(['id'=>$data[$key]['activity_id']])->asArray()->one();
+                $Activities=Activities::find()->where(['id'=>$data[$key]['activity_id']])->with('sports')->asArray()->one();
                 $data[$key]['title']=$Activities['title'];
                 $data[$key]['sports_id']=$Activities['sports_id'];
+                $data[$key]['sports']=$Activities['sports'];
             }
             return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }

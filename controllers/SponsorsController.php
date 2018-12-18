@@ -253,9 +253,10 @@ class SponsorsController extends BaseController
         $data=SponsorsCollect::find()->where(['user_id'=>$user_id])->select('user_id,sponsors_id')->asArray()->all();
         if ($data){
             foreach ($data as $key => $value){
-                $clubs=Sponsors::find()->where(['id'=>$data[$key]['sponsors_id']])->asArray()->one();
+                $clubs=Sponsors::find()->where(['id'=>$data[$key]['sponsors_id']])->with('sports')->asArray()->one();
                 $data[$key]['sponsors_name']=$clubs['sponsors_name'];
                 $data[$key]['sponsors_activity']=$clubs['sponsors_activity'];
+                $data[$key]['sports']=$clubs['sports'];
             }
             return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }
