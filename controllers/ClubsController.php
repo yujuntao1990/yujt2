@@ -276,7 +276,7 @@ class ClubsController extends BaseController
             //$data=Users::find()->select('username')->orderBy('username')->asArray()->all();
             foreach ($last_names as $key => $value)
             {
-                $first[]=substr($value,0,1);
+                $first[]=strtoupper(substr($value,0,1));
             }
             //var_dump($first);exit();
             $first=array_unique($first);

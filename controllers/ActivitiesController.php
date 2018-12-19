@@ -117,8 +117,8 @@ class ActivitiesController extends BaseController
                 $model->title=$post['title'];
                 $model->content=$post['content'];
                 $model->cate_id=$post['cate_id'];
-                $model->reg_time_start=$post['reg_time_start'];
-                $model->reg_time_end=$post['reg_time_end'];
+                $model->reg_time_start=strtotime($post['reg_time_start']);
+                $model->reg_time_end=strtotime($post['reg_time_end']);
                 $model->people_num=$post['people_num'];
                 $model->address=$post['address'];
                 $model->entry_fee=$post['entry_fee'];
@@ -126,9 +126,11 @@ class ActivitiesController extends BaseController
                 $model->sports_id=$post['sports_id'];
                 $model->contact=$post['contact'];
                 $model->user_id=$post['user_id'];
+                $model->weekend=date('l',strtotime($post['reg_time_end']));
                 //var_dump($file);exit();
 
                 if (!$model->validate()){
+                    //var_dump($model->getErrors());exit();
                     throw new Exception($model->getErrors());
                 }
                 if (isset($_FILES['photo_url'])){
@@ -216,7 +218,7 @@ class ActivitiesController extends BaseController
 
     public function actionList()
     {
-        $data = Activities::find()->with('sports')->with('cates')->with('lifes')->asArray()->all();
+        $data = Activities::find()->leftJoin(Sports::tableName(),'sports.id=activities.sports_id')->select('activities.*,sports.sport_content')->asArray()->all();
         if (!empty($data)){
             return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }
@@ -471,7 +473,7 @@ class ActivitiesController extends BaseController
     {
         $post=Yii::$app->request->post();
         if (!empty($post)){
-            $query=Activities::find();
+            $query=Activities::find()->leftJoin(Sports::tableName(),'sports.id=activities.sports_id')->select('activities.*,sports.sport_content');
             //var_dump($query);exit();
             if (!empty($post['cate_id'])){
                 $query=$query->andWhere(['cate_id'=>$post['cate_id']]);
@@ -497,69 +499,71 @@ class ActivitiesController extends BaseController
             }
             //var_dump($query->createCommand()->getRawSql());
             //var_dump($query->where);exit();
-            $d=$post['datetime'][0];
-            //var_dump(empty($d));exit();
-            if (!empty($d)){
-                //var_dump(empty($post['datetime']));exit();
-                $num=count($query->where);
-                if ($num==1){
-                    foreach ($post['datetime'] as $key => $value){
-                        $s=strtotime($value);
-                        $da=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
-                        if ($da){
-                            $data[]=$da;
-                        }
-                        //var_dump($query->where);exit();
-                        unset($query->where[2]);
-                        unset($query->where[3]);
+            if (isset($post['datetime'])){
+                $d=$post['datetime'][0];
+                //var_dump(empty($d));exit();
+                if (!empty($d)){
+                    //var_dump(empty($post['datetime']));exit();
+                    $num=count($query->where);
+                    if ($num==1){
+                        foreach ($post['datetime'] as $key => $value){
+                            $s=strtotime($value);
+                            $da=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
+                            if ($da){
+                                $data[]=$da;
+                            }
+                            //var_dump($query->where);exit();
+                            unset($query->where[2]);
+                            unset($query->where[3]);
 
-                        //var_dump($query);
+                            //var_dump($query);
+                        }
+                        if (!empty($data)){
+                            return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+                        }
+                        return json_encode(['code'=>500,'message'=>'空数据']);
                     }
-                    if (!empty($data)){
-                        return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+                    if ($num==3){
+                        foreach ($post['datetime'] as $key => $value){
+                            $s=strtotime($value);
+                            $da=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
+                            if ($da){
+                                $data[]=$da;
+                            }
+                            unset($query->where[3]);
+                            unset($query->where[4]);
+                            //var_dump($query->where);exit();
+                            //var_dump($query);
+                        }
+                        if (!empty($data)){
+                            return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+                        }
+                        return json_encode(['code'=>500,'message'=>'空数据']);
                     }
-                    return json_encode(['code'=>500,'message'=>'空数据']);
-                }
-                if ($num==3){
+                    if ($num==4){
+                        foreach ($post['datetime'] as $key => $value){
+                            $s=strtotime($value);
+                            $da=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
+                            if ($da){
+                                $data[]=$da;
+                            }
+                            unset($query->where[4]);
+                            unset($query->where[5]);
+                            //var_dump($query);
+                        }
+                        if (!empty($data)){
+                            return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
+                        }
+                        return json_encode(['code'=>500,'message'=>'空数据']);
+                    }
                     foreach ($post['datetime'] as $key => $value){
                         $s=strtotime($value);
-                        $da=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
-                        if ($da){
-                            $data[]=$da;
-                        }
-                        unset($query->where[3]);
-                        unset($query->where[4]);
-                        //var_dump($query->where);exit();
+                        $data[]=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
+                        $query->where=null;
                         //var_dump($query);
                     }
-                    if (!empty($data)){
-                        return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
-                    }
-                    return json_encode(['code'=>500,'message'=>'空数据']);
+                    return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
                 }
-                if ($num==4){
-                    foreach ($post['datetime'] as $key => $value){
-                        $s=strtotime($value);
-                        $da=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
-                        if ($da){
-                            $data[]=$da;
-                        }
-                        unset($query->where[4]);
-                        unset($query->where[5]);
-                        //var_dump($query);
-                    }
-                    if (!empty($data)){
-                        return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
-                    }
-                    return json_encode(['code'=>500,'message'=>'空数据']);
-                }
-                foreach ($post['datetime'] as $key => $value){
-                    $s=strtotime($value);
-                    $data[]=$query->andFilterWhere(['>=','reg_time_end',$s])->andFilterWhere(['<','reg_time_end',$s+24*3600])->asArray()->all();
-                    $query->where=null;
-                    //var_dump($query);
-                }
-                return json_encode(['code' => 200, 'message' => "获取数据成功", 'data' => $data]);
             }
             //var_dump($query->createCommand()->getRawSql());exit();
             $data=$query->asArray()->all();
@@ -575,20 +579,21 @@ class ActivitiesController extends BaseController
     {
         $post=Yii::$app->request->post();
         if (!empty($post)){
-            $query=Activities::find();
+            $query=Activities::find()->leftJoin(Sports::tableName(),'sports.id=activities.sports_id')->select('activities.*,sports.sport_content');
             //var_dump($query);exit();
             if (!empty($post['cate_id'])){
-                $query=$query->andWhere(['cate_id'=>$post['cate_id']]);
+                $query=$query->andWhere(['activities.cate_id'=>$post['cate_id']]);
             }
             if (!empty($post['life_id'])){
-                $query=$query->andWhere(['life_id'=>$post['life_id']]);
+                $query=$query->andWhere(['activities.life_id'=>$post['life_id']]);
             }
             if (!empty($post['qinzi_id'])){
-                $query=$query->andWhere(['qinzi_id'=>$post['qinzi_id']]);
+                $query=$query->andWhere(['activities.qinzi_id'=>$post['qinzi_id']]);
             }
             if (!empty($post['weekend'])){
-                $week=strtotime("this ".$post['weekend']);
-                $query=$query->andFilterWhere(['>=','reg_time_end',$week])->andFilterWhere(['<','reg_time_end',$week+24*3600]);
+//                $week=strtotime("this ".$post['weekend']);
+//                $query=$query->andFilterWhere(['>=','reg_time_end',$week])->andFilterWhere(['<','reg_time_end',$week+24*3600]);
+                $query->andFilterWhere(['activities.weekend'=>$post['weekend']]);
             }
             $data=$query->asArray()->all();
             if ($data){

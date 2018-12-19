@@ -59,7 +59,7 @@ class SponsorsController extends BaseController
     public function actionView($id)
     {
         $data=$this->findModel($id);
-        $data=ArrayHelper::toArray($data);
+//        $data=ArrayHelper::toArray($data);
         //var_dump($data);exit();
         if (!empty($data)){
             $user=Users::findOne($data['user_id']);
@@ -199,7 +199,7 @@ class SponsorsController extends BaseController
      */
     protected function findModel($id)
     {
-        if (($model = Sponsors::findOne($id)) !== null) {
+        if (($model = Sponsors::find()->where(['id'=>$id])->with('sports')->asArray()->one()) !== null) {
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');

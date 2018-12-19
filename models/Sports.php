@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "sports".
  *
  * @property integer $id
- * @property integer $content
+ * @property integer $sport_content
  */
 class Sports extends \yii\db\ActiveRecord
 {
@@ -26,8 +26,8 @@ class Sports extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['content'], 'required'],
-            [['content'], 'integer'],
+            [['sport_content'], 'required'],
+            [['sport_content'], 'integer'],
         ];
     }
 
@@ -38,7 +38,7 @@ class Sports extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'content' => 'Content',
+            'sport_content' => 'sport_content',
         ];
     }
 }
