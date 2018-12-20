@@ -8,6 +8,7 @@ use app\models\Applicants;
 use app\models\Cate;
 use app\models\Comment;
 use app\models\Groups;
+use app\models\Life;
 use app\models\Lifes;
 use app\models\OrderApplicant;
 use app\models\Orders;
@@ -641,9 +642,9 @@ class ActivitiesController extends BaseController
         return json_encode(['code'=>500,'message'=>'空数据']);
     }
 
-    public function actionCates()
+    public function actionLife()
     {
-        $data = Cate::find()->asArray()->all();
+        $data = Life::find()->asArray()->all();
         if (!empty($data)){
             return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }
