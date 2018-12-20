@@ -17,7 +17,7 @@ class Lifes extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'lifess';
+        return 'lifes';
     }
 
     /**
