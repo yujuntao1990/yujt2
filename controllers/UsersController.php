@@ -268,4 +268,23 @@ class UsersController extends BaseController
         $data['Sponsors']=Sponsors::find()->where(['user_id'=>$id])->with('sports')->asArray()->all();
         return json_encode(['code'=>200,'message'=>'获取成功','data'=>$data]);
     }
+
+    public function actionIsCreated($id)
+    {
+        $activity_created=Clubs::findAll(['user_id'=>$id]);
+        $sponsors_created=Sponsors::findAll(['user_id'=>$id]);
+        if ($activity_created&&$sponsors_created)
+        {
+            return json_encode(['code'=>200,'message'=>'用户已创建俱乐部和赞助商']);
+        }elseif ($activity_created)
+        {
+            return json_encode(['code'=>201,'message'=>'用户已创建俱乐部']);
+        }elseif ($sponsors_created)
+        {
+            return json_encode(['code'=>202,'message'=>'用户已创建赞助商']);
+        }else
+        {
+            return json_encode(['code'=>500,'message'=>'用户啥都没创建']);
+        }
+    }
 }
