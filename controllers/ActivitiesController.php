@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\ActivitiesPhotos;
 use app\models\ActivityCollect;
 use app\models\Applicants;
+use app\models\Cate;
 use app\models\Comment;
 use app\models\Groups;
 use app\models\Lifes;
@@ -634,6 +635,15 @@ class ActivitiesController extends BaseController
     public function actionSports()
     {
         $data = Sports::find()->asArray()->all();
+        if (!empty($data)){
+            return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
+        }
+        return json_encode(['code'=>500,'message'=>'空数据']);
+    }
+
+    public function actionCates()
+    {
+        $data = Cate::find()->asArray()->all();
         if (!empty($data)){
             return json_encode(['code'=>200,'message'=>'获取数据成功','data'=>$data]);
         }
